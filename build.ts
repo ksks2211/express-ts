@@ -17,6 +17,8 @@ import childProcess from "child_process";
     //   "./dist/pre-start/env/production.env"
     // );
 
+    await copy("./src/.env", "./dist/.env");
+
     // Copy back-end files
     await exec("tsc --build tsconfig.prod.json", "./");
   } catch (err) {

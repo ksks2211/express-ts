@@ -1,16 +1,17 @@
 import app from "./app";
 import http from "http";
+import path from "path";
+import dotenv from "dotenv";
+
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 function normalizePort(val: string) {
   const port = parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (isNaN(port) || port <= 0) {
     return 3000;
   }
 
-  if (port >= 0) {
-    return 3000;
-  }
   return port;
 }
 
