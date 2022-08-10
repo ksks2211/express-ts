@@ -1,16 +1,15 @@
-import { HttpError } from "http-errors";
 import HttpStatusCodes from "http-status-codes";
 
-export abstract class CustomBadRequestError extends HttpError {
-  public readonly status = HttpStatusCodes.BAD_REQUEST;
+export abstract class CustomError extends Error {
+  public readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
 
-  constructor(msg: string, status: number) {
+  constructor(msg: string, httpStatus: number) {
     super(msg);
-    this.status = status;
+    this.HttpStatus = httpStatus;
   }
 }
 
-export class ParamMissingError extends CustomBadRequestError {
+export class ParamMissingError extends CustomError {
   public static readonly Msg =
     "One or more of the required parameters was missing.";
   public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
@@ -20,12 +19,12 @@ export class ParamMissingError extends CustomBadRequestError {
   }
 }
 
-// export class UserNotFoundError extends CustomBadRequestError {
-//   public static readonly Msg =
-//     "A user with the given id does not exists in the database.";
-//   public static readonly HttpStatus = HttpStatusCodes.NOT_FOUND;
+export class UserNotFoundError extends CustomError {
+  public static readonly Msg =
+    "A user with the given id does not exists in the database.";
+  public static readonly HttpStatus = HttpStatusCodes.NOT_FOUND;
 
-//   constructor() {
-//     super(UserNotFoundError.Msg, UserNotFoundError.HttpStatus);
-//   }
-// }
+  constructor() {
+    super(UserNotFoundError.Msg, UserNotFoundError.HttpStatus);
+  }
+}
