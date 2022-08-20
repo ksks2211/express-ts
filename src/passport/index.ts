@@ -1,21 +1,17 @@
+import { Types } from "mongoose";
 import passport from "passport";
 import User from "../models/user";
 import local from "./localStrategy";
 
-export interface IUser extends Express.User {
-  id: any;
-  email: string;
-  accessToken?: String;
-}
-
 export default () => {
   // 로그인 전략 성공시 실행
-  passport.serializeUser((user, done) => {
-    const userInfo = user as IUser;
+  passport.serializeUser<Types.ObjectId>((user, done) => {
+    // if (user.accessToken) {
+    // }
 
-    if (userInfo.accessToken) {
-    }
-    done(null, userInfo.id);
+    user._id;
+
+    done(null, user._id);
   });
 
   passport.deserializeUser((id, done) => {

@@ -1,12 +1,20 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
+export interface IPost {
+  _id: Types.ObjectId;
+  writer: Types.ObjectId;
+  content: string;
+  img?: string;
+  createdAt: Date;
+  hashtags: Types.ObjectId[];
+}
 const {
-  Types: { ObjectId },
+  Types: { ObjectId: SchemaObjectId },
 } = Schema;
 
-const postSchema = new Schema({
+const postSchema = new Schema<IPost>({
   writer: {
-    type: ObjectId,
+    type: SchemaObjectId,
     required: true,
     ref: "User",
   },
@@ -21,7 +29,7 @@ const postSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  hashtags: [{ type: ObjectId, ref: "Hashtag" }],
+  hashtags: [{ type: SchemaObjectId, ref: "Hashtag" }],
 });
 
 export default mongoose.model("Post", postSchema);

@@ -1,7 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import { IUser } from ".";
 import User from "../models/user";
 // const User = require("../models/user");
 
@@ -18,11 +17,7 @@ export default () => {
         if (user) {
           const match = await bcrypt.compare(password, user.password);
           if (match) {
-            const userInfo: IUser = {
-              id: user.id,
-              email: user.email,
-            };
-            done(null, userInfo);
+            done(null, user);
           } else {
             done(null, false, { message: "Invalid Password" });
           }

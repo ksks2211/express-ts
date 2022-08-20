@@ -1,9 +1,20 @@
-import mongoose, { Schema } from "mongoose";
-const {
-  Types: { ObjectId },
-} = Schema;
+import mongoose, { Schema, Types } from "mongoose";
 
-const userSchema = new Schema({
+export interface IUser {
+  _id: Types.ObjectId;
+  email: string;
+  nick: string;
+  password: string;
+  provider: string;
+  snsId?: string;
+  profile?: string;
+  createdAt: Date;
+  posts: Types.ObjectId[];
+  followedBy: Types.ObjectId[];
+  following: Types.ObjectId[];
+}
+
+const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: true,
@@ -32,9 +43,9 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  posts: [{ type: ObjectId, ref: "Post" }],
-  followedBy: [{ type: ObjectId, ref: "User" }],
-  following: [{ type: ObjectId, ref: "User" }],
+  posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+  followedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 export default mongoose.model("User", userSchema);
