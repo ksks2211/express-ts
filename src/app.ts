@@ -8,12 +8,18 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import session from "express-session";
 import { StatusCodes } from "http-status-codes";
-import { initialize_upload } from "./upload";
+import { initialize_upload, UPLOAD_TO } from "./upload";
+import { connect } from "./models";
 import nunjucks from "nunjucks";
+import passport from "passport";
+import passportConfig from "./passport";
 
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
+
+// passport config
+passportConfig();
 
 // set global value
 app.set("view engine", "html");
@@ -23,6 +29,7 @@ nunjucks.configure(path.join(__dirname, "views"), {
   watch: process.env.NODE_ENV !== "production",
   autoescape: true,
 });
+connect();
 
 // initialize
 initialize_upload();
@@ -37,6 +44,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/img", express.static(UPLOAD_TO));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -52,6 +60,10 @@ app.use(
     name: "session-cookie",
   })
 );
+
+// auth
+app.use(passport.initialize()); // req 객체에 passport 설정을 심어서 로그인 정보를 저장할수 있게 함
+app.use(passport.session()); // req.session 객체에 passport 정보(세션관련)를 저장
 
 // routers
 app.use("/", indexRouter);

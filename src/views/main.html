@@ -1,0 +1,85 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="timeline">
+    {% if user %}
+    <div>
+        <form action="/post" method="post" id="twit-form" enctype="multipart/form-data">
+            <div class="input-group">
+                <textarea name="content" id="twit" maxlength="140"></textarea>
+            </div>
+            <div class="img-preview">
+                <img src="" alt="preview" style="display: none;" width="250"  id="img-preview">
+                <input type="hidden" name="url" id="img-url">
+            </div>
+            <div>
+                <label for="img" id="img-label">Upload Image</label>
+                <input type="file" id="img" accept="image/*"><!-- accepts all types of images-->
+                <button type="submit" id="twit-btn" class="btn">TWEET</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    <div class="twits">
+        <form action="/hashtag" id="hashtag-form">
+            <input type="text" name="hashtag" placeholder="Tag Searching.">
+            <button class="btn">Search</button>
+        </form>
+        {% for twit in twits %}
+        <div class="twit">
+            <input type="hidden" class="twit-user-id" value="{{ twit.User.id }}">
+            <input type="hidden" class="twit-id" value="{{twit.id}}">
+            <div class="twit-author">{{ twit.User.nick }}</div>
+            {% if not followerIdList.includes(twit.User.id) and twit.User.id !== user.id %}
+            <button class="twit-follow">Follow</button>
+            {% endif %}
+            <div class="twit-content">{{ twit.content }}</div>
+            {% if twit.img %}
+            <div class="twit-img"><img src="{{twit.img}}" alt="Thumbnail"></div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    const image = document.getElementById('img');
+    if (image){
+        image.addEventListener('change',function(e){ // upload 되면
+            const formData = new FormData();
+            console.log(this,this.files);
+            formData.append('img',this.files[0]);
+            axios.post('/post/img',formData)
+                .then((res)=>{
+                    document.getElementById('img-url').value = res.data.url;
+                    document.getElementById('img-preview').src = res.data.url;
+                    document.getElementById('img-preview').style.display='inline';
+                })
+                .catch((err)=>{
+                    console.error(err);
+                });
+        });
+        document.querySelectorAll('.twit-follow').forEach((tag)=>{
+            tag.addEventListener('click',async ()=>{
+                const myId = document.querySelector('#my-id');
+                if(myId){
+                    const userId = tag.parentNode.querySelector('.twit-user-id').value;
+                    if(userId!==myId.value){
+                        if(confirm("Want to Follow?")){
+                            try{
+                                await axios.post(`/user/${userId}/follow`);
+                                location.reload()// 새로고침
+                            }catch(err){
+                                console.error(err);
+                            }
+                        };
+                    }
+                }
+            })
+        })
+    }
+</script>
+{% endblock %}
